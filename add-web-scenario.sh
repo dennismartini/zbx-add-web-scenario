@@ -6,8 +6,8 @@ ZBXURL=$1
 ZBXHOSTNAME=$2
 
 #Usuário e Senha do Zabbix
-USER="$3"
-PASS="$4"
+USER=$3
+PASS=$4
 
 #Nome do Cenário WEB
 CWNAME="$5"
@@ -17,8 +17,8 @@ HOSTID="$6"
 
 HEADER='Content-Type:application/json'
 #URL do Zabbix
-URL="http://$ZBXURL/api_jsonrpc.php"
-
+URL='http://'$ZBXURL'/api_jsonrpc.php'
+echo $URL
 #Nome do Host que o cenário WEB será incluso
 VHOST="$ZBXHOSTNAME"
 
@@ -35,8 +35,8 @@ autenticacao()
         "jsonrpc": "2.0",
         "method": "user.login",
         "params": {
-            "user": '$USER',
-            "password": '$PASS'
+            "user": "'$USER'",
+            "password": "'$PASS'"
         },
         "id": 0
     }
@@ -45,26 +45,33 @@ autenticacao()
 }
 
 
+
 TOKEN=$(autenticacao)
-JSON="
+echo "--------------------------"
+echo $TOKEN
+echo "--------------------------"
+JSON='
 {
     "jsonrpc": "2.0",
     "method": "httptest.create",
     "params": {
-        "name": "$CWNAME",
-        "hostid": "$6",
+        "name": "'$CWNAME'",
+        "hostid": "'$6'",
         "steps": [
                         {
-                "name": "$7",
-                "url": "$8",
-                "status_codes": "$9",
-                "no": 1
+                "name": "'$7'",
+                "url": "'$8'",
+                "status_codes": "'$9'",
+                "required": "'$10'",
+                "no": "1"
             }
         ]
     },
     "auth": "'$TOKEN'",
-    "id": 1
+    "id": "1"
 }
-"
+'
+echo $JSON |jq
+echo "--------------------------"
 
 curl -s -X POST -H "$HEADER" -d "$JSON" "$URL" |jq
